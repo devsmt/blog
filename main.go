@@ -1,7 +1,6 @@
 package main
 
 import (
-	"io"
 	"fmt"
 	"github.com/gorilla/mux"
 	"io/ioutil"

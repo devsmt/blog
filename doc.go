@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"io"
 )
 
 type document struct {
