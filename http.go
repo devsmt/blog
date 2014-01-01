@@ -1,13 +1,13 @@
 package main
 
 import (
-	"log"
 	"fmt"
+	"log"
 	"net/http"
 )
 
 func internalServerErr(w http.ResponseWriter, err error) {
-        w.WriteHeader(http.StatusInternalServerError)
-        fmt.Fprintln(w, "500 Internal Server Error")
-        log.Println("internal server error:", err)
+	w.WriteHeader(http.StatusInternalServerError)
+	fmt.Fprintln(w, "500 Internal Server Error")
+	log.Println("internal server error:", err)
 }

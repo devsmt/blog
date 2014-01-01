@@ -1,13 +1,13 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"github.com/russross/blackfriday"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
-	"bufio"
 )
 
 func mustEnvVar(varname string) string {
@@ -23,8 +23,8 @@ func url(relpath string) string {
 }
 
 var (
-	GITHUB_USER = "weberc2"
-	HEROKU_PORT = ":" + mustEnvVar("PORT")
+	GITHUB_USER    = "weberc2"
+	HEROKU_PORT    = ":" + mustEnvVar("PORT")
 	DIRECTORY_FILE = url("dirfile")
 )
 
@@ -36,13 +36,13 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer rsp.Body.Close()
 
-	paths := []string {}
+	paths := []string{}
 	for s := bufio.NewScanner(rsp.Body); s.Scan(); {
 		paths = append(paths, s.Text())
 	}
 
 	docs := []*document{}
-	for i:=len(paths)-1; i>=0; i-- {
+	for i := len(paths) - 1; i >= 0; i-- {
 		path := paths[i]
 		rsp, err := http.Get(url(path))
 		if err != nil {

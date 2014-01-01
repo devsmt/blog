@@ -1,15 +1,15 @@
 package main
 
 import (
-	"io/ioutil"
-	"io"
-	"github.com/russross/blackfriday"
-	"strings"
 	"fmt"
+	"github.com/russross/blackfriday"
+	"io"
+	"io/ioutil"
+	"strings"
 )
 
 type document struct {
-        Path, Title, Text string
+	Path, Title, Text string
 }
 
 func validateDocument(lines []string) error {
@@ -48,8 +48,8 @@ func parseDoc(path string, r io.Reader) (*document, error) {
 	}
 
 	return &document{
-		Path: path,
+		Path:  path,
 		Title: lines[0],
-		Text: string(blackfriday.MarkdownCommon([]byte(fromLines(lines[2:])))),
+		Text:  string(blackfriday.MarkdownCommon([]byte(fromLines(lines[2:])))),
 	}, nil
 }
