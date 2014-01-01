@@ -1,24 +1,55 @@
 package main
 
 import (
-	"bufio"
+	"io/ioutil"
 	"io"
+	"github.com/russross/blackfriday"
+	"strings"
+	"fmt"
 )
 
 type document struct {
-        Title, Path string
-        Body []byte
+        Path, Title, Text string
 }
 
-func parseDoc(path string, r io.Reader) *document {
-        s := bufio.NewScanner(r)
-        s.Scan()
-        d := new(document)
-        d.Title = s.Text() // set Title = first line
-        s.Scan() // skip the second line (the ======= below the title)
-        d.Path = path
-        for s.Scan() { // add other lines to the body
-                d.Body = append(d.Body, s.Bytes()...)
-        }
-        return d
+func validateDocument(lines []string) error {
+	invalidMarkdownDocumentError := fmt.Errorf("Invalid markdown document")
+	if len(lines) < 3 {
+		return invalidMarkdownDocumentError
+	}
+
+	// make sure the second line is `==========` or some such
+	for _, char := range lines[1] {
+		if char != '=' {
+			return invalidMarkdownDocumentError
+		}
+	}
+	return nil
+}
+
+func fromLines(lines []string) string {
+	out := ""
+	for _, line := range lines {
+		out += line + "\n"
+	}
+	return out
+}
+
+func parseDoc(path string, r io.Reader) (*document, error) {
+	data, err := ioutil.ReadAll(r)
+	if err != nil {
+		return nil, err
+	}
+
+	lines := strings.Split(string(data), "\n")
+
+	if err := validateDocument(lines); err != nil {
+		return nil, err
+	}
+
+	return &document{
+		Path: path,
+		Title: lines[0],
+		Text: string(blackfriday.MarkdownCommon([]byte(fromLines(lines[2:])))),
+	}, nil
 }
