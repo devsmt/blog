@@ -8,12 +8,13 @@ import (
 	"net/http"
 	"os"
 	"bufio"
+	"text/template"
 )
 
 func mustEnvVar(varname string) string {
 	env := os.Getenv(varname)
 	if env == "" {
-		log.Fatal("%s not set", varname)
+		log.Fatalf("%s not set", varname)
 	}
 	return env
 }
@@ -23,16 +24,35 @@ func url(relpath string) string {
 }
 
 var (
-	GITHUB_USER = mustEnvVar("GITHUB_USER")
+	GITHUB_USER = "weberc2"
 	HEROKU_PORT = ":" + mustEnvVar("PORT")
 	DIRECTORY_FILE = url("dirfile")
 	TITLE = "weberc2"
+	HOME_RENDERER = NewMarkdownRenderer(fetchTemplate(url("tmpl/home.html")))
+	PAGE_RENDERER = NewMarkdownRenderer(fetchTemplate(url("tmpl/page.html")))
 )
 
-func init() {
-	header := fmt.Sprintf(`<html><body><h1 class="main-header"><a href="/">%s</a></h1>`, TITLE)
-	SetHeader([]byte(header))
-	SetFooter([]byte(`</body></html>`))
+func fetch(filename string) ([]byte, error) {
+	rsp, err := http.Get(filename)
+	if err != nil {
+		return nil, err
+	}
+	defer rsp.Body.Close()
+
+	if rsp.StatusCode > 299 || rsp.StatusCode < 200 {
+		return nil, fmt.Errorf("HTTP problem fetching %s: %s", filename, rsp.Status)
+	}
+
+	return ioutil.ReadAll(rsp.Body)
+}
+
+func fetchTemplate(filename string) *template.Template {
+	data, err := fetch(filename)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return template.Must(template.New(filename).Parse(string(data)))
 }
 
 func main() {
@@ -60,7 +80,9 @@ func main() {
 			return
 		}
 
-		Write(w, data)
+		if err := PAGE_RENDERER.Write(w, data); err != nil {
+			log.Println(err)
+		}
 	})
 
 	// home handler
@@ -85,7 +107,9 @@ func main() {
 			docs = append(docs, parseDoc(path, rsp.Body))
 		}
 
-		WriteHome(w, docs)
+		if err := HOME_RENDERER.WriteHome(w, docs); err != nil {
+			log.Println(err)
+		}
 	})
 
 	if err := http.ListenAndServe(HEROKU_PORT, r); err != nil {
