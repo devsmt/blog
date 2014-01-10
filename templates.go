@@ -35,7 +35,7 @@ article {
 	background-color: #fff;
 	border: 1px solid #ccc;
 	border-radius: 3px;
-	padding: 15px 15px 15px 15px;
+	padding: 1em 1em 0 1em;
 	margin: 0 1em 1em 1em;
 }
 
@@ -51,6 +51,11 @@ a:hover {
 .main-header a:visited {
 	color: #fff;
 	font-weight: 200;
+}
+
+.main-header a:hover {
+	color: #ccc;
+	text-decoration: none;
 }
 
 @font-face {
@@ -84,8 +89,9 @@ h2 a {
 	color: black;
 }
 
-h2, h3 a:hover {
+h2 a:hover {
 	color: rgb(22, 85, 126);
+	text-decoration: none;
 }
 
 `
@@ -124,6 +130,6 @@ func templify(content string) *template.Template {
 }
 
 var (
-	HOME_TEMPLATE = templify(`{{range .}}<article><h2><a href="{{.Path}}">{{.Title}}</a></h2>{{.Snippet}}<a class="more" href="{{.Path}}">Read More</a></article>{{end}}`)
+	HOME_TEMPLATE = templify(`{{range .}}<article><h2><a href="{{.Path}}">{{.Title}}</a></h2>{{.Snippet}}<p><a class="more" href="{{.Path}}">Read more...</a></p></article>{{end}}`)
 	DOC_TEMPLATE  = templify("<article>{{.}}</article>")
 )
