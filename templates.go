@@ -15,15 +15,17 @@ body {
 	margin: 0;
 }
 
+.main {
+	max-width: 800px;
+	min-width: 500px;
+	margin: auto;
+}
+
 .content {
 	line-height: 1.5;
 }
 
 article {
-	min-width: 500px;
-	width: 45%;
-	float: left;
-	display: inline-block;
 	background-color: #fff;
 	border: 1px solid #ccc;
 	border-radius: 3px;
