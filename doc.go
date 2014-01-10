@@ -12,6 +12,13 @@ type document struct {
 	Path, Title, Text string
 }
 
+func (d *document) Snippet() string {
+	if i := strings.Index(d.Text, "<!-- more -->"); i >= 0 {
+		return d.Text[:i]
+	}
+	return d.Text
+}
+
 func validateDocument(lines []string) error {
 	invalidMarkdownDocumentError := fmt.Errorf("Invalid markdown document")
 	if len(lines) < 3 {
