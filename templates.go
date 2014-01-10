@@ -25,7 +25,7 @@ body {
 	line-height: 1.5;
 }
 
-p {
+p, ol {
 	font-size: 1.25em;
 	line-height: 1.7em;
 	font-family: "Droid Serif", serif;
