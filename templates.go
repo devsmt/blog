@@ -35,22 +35,36 @@ article {
 	background-color: #fff;
 	border: 1px solid #ccc;
 	border-radius: 3px;
-	padding: 1px 15px;
+	padding: 15px 15px 15px 15px;
 	margin: 0 1em 1em 1em;
 }
 
 a, u {
 	text-decoration: none;
+	color: rgb(22, 85, 126);
+}
+
+a:hover {
+	text-decoration: underline;
 }
 
 .main-header a:visited {
 	color: #fff;
+	font-weight: 200;
+}
+
+@font-face {
+	font-family: "Lato";
+	font-style: normal;
+	font-weight: 400;
+	src: local("Lato Bold");
 }
 
 .main-header {
 	margin: 0;
 	margin-bottom: 20px;
 	padding: 20px;
+	font-family:Lato, sans-serif;
 	font-size: 2em;
 	background-color: rgb(22, 85, 126);
 	color: #fff;
@@ -62,8 +76,16 @@ p {
 }
 
 h1, h2 {
-	margin: .5em 0;
+	margin: 0 0 .25em 0;
 	font-size: 2em;
+}
+
+h2 a {
+	color: black;
+}
+
+h2, h3 a:hover {
+	color: rgb(22, 85, 126);
 }
 
 `
@@ -82,10 +104,12 @@ h1, h2 {
 		  ga('send', 'pageview');
 
 		</script>
+		<link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Lato:300,400,700,900" />
+		<link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic,700italic" />
 	</head>
 	<body>
 		<div class="main">
-			<h1 class="main-header"><a href="/">Craig Weber's blog</a></h1>
+			<h1 class="main-header"><a href="/">CRAIG WEBER</a></h1>
 			<div class="content">
 			%s
 			</div>
@@ -100,6 +124,6 @@ func templify(content string) *template.Template {
 }
 
 var (
-	HOME_TEMPLATE = templify(`{{range .}}<article><h2><a href="{{.Path}}">{{.Title}}</a></h2>{{.Snippet}}</article>{{end}}`)
+	HOME_TEMPLATE = templify(`{{range .}}<article><h2><a href="{{.Path}}">{{.Title}}</a></h2>{{.Snippet}}<a class="more" href="{{.Path}}">Read More</a></article>{{end}}`)
 	DOC_TEMPLATE  = templify("<article>{{.}}</article>")
 )
