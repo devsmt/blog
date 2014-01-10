@@ -11,18 +11,24 @@ body {
 	font-family: helvetica, verdana, sans-serif;
 	background-color: #eee;
 	font-size: 1em;
-	color: #555;
+	color: #333;
 	margin: 0;
 }
 
 .main {
-	max-width: 800px;
-	min-width: 500px;
-	margin: auto;
 }
 
 .content {
+	max-width: 800px;
+	min-width: 500px;
+	margin: auto;
 	line-height: 1.5;
+}
+
+p {
+	font-size: 1.25em;
+	line-height: 1.7em;
+	font-family: "Droid Serif", serif;
 }
 
 article {
@@ -38,13 +44,16 @@ a, u {
 }
 
 .main-header a:visited {
-	color: black;
+	color: #fff;
 }
 
 .main-header {
-	margin: .5em;
-	padding: 0;
+	margin: 0;
+	margin-bottom: 20px;
+	padding: 20px;
 	font-size: 2em;
+	background-color: rgb(22, 85, 126);
+	color: #fff;
 }
 
 p {
@@ -54,6 +63,7 @@ p {
 
 h1, h2 {
 	margin: .5em 0;
+	font-size: 2em;
 }
 
 `
