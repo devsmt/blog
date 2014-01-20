@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	. "github.com/weberc2/blog/doc"
 )
 
 func mustEnvVar(varname string) string {
@@ -41,7 +42,7 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 		paths = append(paths, s.Text())
 	}
 
-	docs := []*document{}
+	docs := []*Document{}
 	for i := len(paths) - 1; i >= 0; i-- {
 		path := paths[i]
 		rsp, err := http.Get(url(path))
@@ -51,7 +52,7 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		defer rsp.Body.Close()
 
-		doc, err := parseDoc(path, rsp.Body)
+		doc, err := Parse(rsp.Body)
 		if err != nil {
 			log.Println(err)
 			continue
@@ -59,7 +60,9 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 		docs = append(docs, doc)
 	}
 
-	HOME_TEMPLATE.Execute(w, docs)
+	if err := HOME_TEMPLATE.Execute(w, docs); err != nil {
+		log.Println("Templating error:", err)
+	}
 }
 
 func documentHandler(w http.ResponseWriter, r *http.Request) {
@@ -83,7 +86,9 @@ func documentHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	DOC_TEMPLATE.Execute(w, string(blackfriday.MarkdownCommon(data)))
+	if err := DOC_TEMPLATE.Execute(w, string(blackfriday.MarkdownCommon(data))); err != nil {
+		log.Println("Templating error:", err)
+	}
 }
 
 func main() {
