@@ -18,8 +18,8 @@ func mustEnvVar(varname string) string {
 }
 
 func url(relpath string) string {
-//	return fmt.Sprintf("http://%s.github.io/%s", GITHUB_USER, relpath)
-	return fmt.Sprintf("http://localhost:8000/%s", relpath)
+	return fmt.Sprintf("http://%s.github.io/%s", GITHUB_USER, relpath)
+//	return fmt.Sprintf("http://localhost:8000/%s", relpath) for debug
 }
 
 var (
