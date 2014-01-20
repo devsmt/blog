@@ -78,6 +78,6 @@ func templify(content string) *template.Template {
 }
 
 var (
-	HOME_TEMPLATE = templify(`{{range .}}<article><h2><a href="{{.Path}}">{{.Metadata.Title}}</a></h2>{{.Text}}</article>{{end}}`)
-	DOC_TEMPLATE  = templify("<article>{{.}}</article>")
+	HOME_TEMPLATE = templify(`{{range .}}<article><h2><a href="{{.Path}}">{{.Metadata.Title}}</a></h2>{{.Snippet}}<a href={{.Path}}>Read more...</a></article>{{end}}`)
+	DOC_TEMPLATE  = templify("<article><h2>{{.Metadata.Title}}</h2>{{.Text}}</article>")
 )

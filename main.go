@@ -3,8 +3,6 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"github.com/russross/blackfriday"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -20,7 +18,8 @@ func mustEnvVar(varname string) string {
 }
 
 func url(relpath string) string {
-	return fmt.Sprintf("http://%s.github.io/%s", GITHUB_USER, relpath)
+//	return fmt.Sprintf("http://%s.github.io/%s", GITHUB_USER, relpath)
+	return fmt.Sprintf("http://localhost:8000/%s", relpath)
 }
 
 var (
@@ -57,6 +56,7 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 			log.Println(err)
 			continue
 		}
+		doc.Path = path
 		docs = append(docs, doc)
 	}
 
@@ -74,7 +74,7 @@ func documentHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer resp.Body.Close()
 
-	data, err := ioutil.ReadAll(resp.Body)
+	doc, err := Parse(resp.Body)
 	if err != nil {
 		internalServerErr(w, err)
 		return
@@ -86,7 +86,7 @@ func documentHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := DOC_TEMPLATE.Execute(w, string(blackfriday.MarkdownCommon(data))); err != nil {
+	if err := DOC_TEMPLATE.Execute(w, doc); err != nil {
 		log.Println("Templating error:", err)
 	}
 }

@@ -1,10 +1,12 @@
 package doc
 
 import (
+	"github.com/russross/blackfriday"
 	"testing"
 	"strings"
 	"log"
 	"fmt"
+	"unicode"
 )
 
 func setupParseTest(input string) *Document {
@@ -15,6 +17,10 @@ func setupParseTest(input string) *Document {
 	return d
 }
 
+func md(s string) string {
+	return string(blackfriday.MarkdownCommon([]byte(s)))
+}
+
 func expect(exp, act string) error {
 	if act != exp {
 		return fmt.Errorf("Expected:\n%s\nGot:\n%s\n", exp, act)
@@ -23,11 +29,13 @@ func expect(exp, act string) error {
 }
 
 func expectText(d *Document, exp string) error {
-	return expect(exp, d.Text())
+	return expect(md(exp), d.Text())
 }
 
 func expectSnippet(d *Document, exp string) error {
-	return expect(exp, d.Snippet())
+	exp = strings.TrimFunc(md(exp), unicode.IsSpace)
+	act := strings.TrimFunc(d.Snippet(), unicode.IsSpace)
+	return expect(exp, act)
 }
 
 func expectMetadata(d *Document, key, exp string) error {
@@ -53,7 +61,7 @@ func TestParseWithMultiLineInput(t *testing.T) {
 }
 
 func TestSnippet(t *testing.T) {
-	input := "This is some text.<!-- more -->This is some more text"
+	input := "This is some text.\n\n<!-- more -->\n\nThis is some more text"
 	d := setupParseTest(input)
 
 	if err := expectText(d, input); err != nil {

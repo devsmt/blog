@@ -1,6 +1,7 @@
 package doc
 
 import (
+	"github.com/russross/blackfriday"
 	"bufio"
 	"io"
 	"strings"
@@ -57,16 +58,14 @@ func Parse(r io.Reader) (*Document, error) {
 			continueParsingMetadata = false
 		}
 
-		// check the current line for <!-- more -->; if found, set snippetLength
-		if i := strings.Index(s.Text(), "<!-- more -->"); i != -1 {
-			d.snippetLength = len(data) + i
-		}
 		data = append(data, s.Bytes()...)
 		data = append(data, '\n')
 	}
 
 	if len(data) > 0 {
-		d.text = string(data[:len(data)-1])
+		d.text = string(blackfriday.MarkdownCommon(data))
+		d.text = d.text[:len(d.text)]
+		d.snippetLength = strings.Index(d.text, "<!-- more -->")
 	}
 	return d, nil
 }
