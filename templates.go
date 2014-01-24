@@ -6,99 +6,97 @@ import (
 )
 
 var (
-	style = `
+	base = `<!DOCTYPE html>
+<html>
+	<head>
+		<style>
 body {
-	font-family: helvetica, verdana, sans-serif;
-	background-color: #eee;
-	font-size: 1em;
-	color: #333;
-	margin: 0;
+        font-family: helvetica, verdana, sans-serif;
+        background-color: #eee;
+        font-size: 1em;
+        color: #333;
+        margin: 0;
 }
 
 .main {
 }
 
 .content {
-	max-width: 800px;
-	min-width: 500px;
-	margin: auto;
-	line-height: 1.5;
+        max-width: 1000px;
+        min-width: 500px;
+        margin: auto;
+        line-height: 1.5;
 }
 
-p, ol {
-	font-size: 1.25em;
-	line-height: 1.7em;
-	font-family: "Droid Serif", serif;
+p, ul, ol {
+        font-size: 1.25em;
+        line-height: 1.7em;
+        font-family: "Droid Serif", serif;
 }
 
 article {
-	background-color: #fff;
-	border: 1px solid #ccc;
-	border-radius: 3px;
-	padding: 1em 1em 0 1em;
-	margin: 0 1em 1em 1em;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        padding: 2em 2em 0 2em;
+        margin: 0 1em 1em 1em;
 }
 
 a, u {
-	text-decoration: none;
-	color: rgb(22, 85, 126);
+        text-decoration: none;
+        color: rgb(22, 85, 126);
 }
 
 a:hover {
-	text-decoration: underline;
+        text-decoration: underline;
 }
 
 .main-header a:visited {
-	color: #fff;
-	font-weight: 200;
+        color: #fff;
+        font-weight: 200;
 }
 
 .main-header a:hover {
-	color: #ccc;
-	text-decoration: none;
+        color: #ccc;
+        text-decoration: none;
 }
 
 @font-face {
-	font-family: "Lato";
-	font-style: normal;
-	font-weight: 400;
-	src: local("Lato Bold");
+        font-family: "Lato";
+        font-style: normal;
+        font-weight: 400;
+        src: local("Lato Bold");
 }
 
 .main-header {
-	margin: 0;
-	margin-bottom: 20px;
-	padding: 20px;
-	font-family:Lato, sans-serif;
-	font-size: 2em;
-	background-color: rgb(22, 85, 126);
-	color: #fff;
+        margin: 0;
+        margin-bottom: 20px;
+        padding: 20px;
+        font-family:Lato, sans-serif;
+        font-size: 2em;
+        background-color: rgb(22, 85, 126);
+        color: #fff;
 }
 
 p {
-	margin: 0;
-	margin-bottom: 1em;
+        margin: 0;
+        margin-bottom: 1em;
 }
 
 h1, h2 {
-	margin: 0 0 .25em 0;
-	font-size: 2em;
+        margin: 0 0 .25em 0;
+        font-size: 2em;
 }
 
 h2 a {
-	color: black;
+        color: black;
 }
 
 h2 a:hover {
-	color: rgb(22, 85, 126);
-	text-decoration: none;
+        color: rgb(22, 85, 126);
+        text-decoration: none;
 }
 
-`
-	base = `<html>
-	<head>
-		<style>
-			%s
 		</style>
 		<script>
 		  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -125,7 +123,7 @@ h2 a:hover {
 )
 
 func templify(content string) *template.Template {
-	content = fmt.Sprintf(base, style, content)
+	content = fmt.Sprintf(base, content)
 	return template.Must(template.New("").Parse(content))
 }
 

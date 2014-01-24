@@ -3,10 +3,10 @@ package main
 import (
 	"bufio"
 	"fmt"
+	. "github.com/weberc2/blog/doc"
 	"log"
 	"net/http"
 	"os"
-	. "github.com/weberc2/blog/doc"
 )
 
 func mustEnvVar(varname string) string {
@@ -19,7 +19,7 @@ func mustEnvVar(varname string) string {
 
 func url(relpath string) string {
 	return fmt.Sprintf("http://%s.github.io/%s", GITHUB_USER, relpath)
-//	return fmt.Sprintf("http://localhost:8000/%s", relpath) for debug
+	//	return fmt.Sprintf("http://localhost:8000/%s", relpath)
 }
 
 var (

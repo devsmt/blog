@@ -1,11 +1,11 @@
 package doc
 
 import (
-	"github.com/russross/blackfriday"
-	"testing"
-	"strings"
-	"log"
 	"fmt"
+	"github.com/russross/blackfriday"
+	"log"
+	"strings"
+	"testing"
 	"unicode"
 )
 

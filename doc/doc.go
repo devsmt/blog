@@ -1,8 +1,8 @@
 package doc
 
 import (
-	"github.com/russross/blackfriday"
 	"bufio"
+	"github.com/russross/blackfriday"
 	"io"
 	"strings"
 	"unicode"
