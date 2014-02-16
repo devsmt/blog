@@ -17,9 +17,9 @@ type HttpClient interface {
 type Host string
 
 func (h Host) Join(path string) string {
-	sep := "/"
-	if h[len(h)-1] != sep[0] {
-		sep = ""
+	sep := ""
+	if h[len(h)-1] != '/' {
+		sep = "/"
 	}
 	return string(h) + sep + path
 }
@@ -59,5 +59,10 @@ func (fs *FileServer) Get(relpath string) (*Document, error) {
 		return nil, err
 	}
 	defer rsp.Body.Close()
-	return fs.parser.Parse(rsp.Body)
+	doc, err := fs.parser.Parse(rsp.Body)
+	if err != nil {
+		return nil, err
+	}
+	doc.Metadata["Path"] = relpath
+	return doc, nil
 }

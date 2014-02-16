@@ -3,42 +3,24 @@ package main
 import (
 	"net/http"
 	"fmt"
+	"text/template"
 )
 
-type App struct {
-	FileServer
-	Templates struct {
-		Home, Document interface {}
-	}
-	Port string
-}
-
-func (a *App) Home(w http.ResponseWriter, r *http.Request) {
-	docs, err := a.FileServer.Documents()
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	fmt.Fprintln(w, docs)
-}
-
-func (a *App) Document(w http.ResponseWriter, r *http.Request) {
-	doc, err := a.FileServer.Get(r.URL.Path)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	fmt.Fprintln(w, doc)
+func parseTemplate(filepath string) *template.Template {
+	return template.Must(template.ParseFiles(filepath))
 }
 
 func main() {
 	app := App {
 		FileServer: FileServer{
+			//host: "http://localhost:3000",
 			host: "http://weberc2.github.io/",
 			dirfile: "dirfile",
 			client: http.DefaultClient,
-			parser: new(FakeDocParser),
+			parser: new(MetadataParser),
 		},
+		HomeTemplate: parseTemplate("home.html"),
+		DocumentTemplate: parseTemplate("document.html"),
 	}
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {

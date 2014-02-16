@@ -3,18 +3,14 @@ package main
 import (
 	"io"
 	"io/ioutil"
+	"github.com/russross/blackfriday"
 )
 
 type Document struct {
+	Metadata map[string]string
 	Text []byte
 }
 func (d *Document) String() string { return string(d.Text) }
-
-type FakeDocParser struct{}
-func (p *FakeDocParser) Parse(r io.Reader) (*Document, error) {
-	data, err := ioutil.ReadAll(r)
-	if err != nil {
-		return nil, err
-	}
-	return &Document{Text: data}, nil
+func (d *Document) Html() string {
+	return string(blackfriday.MarkdownCommon(d.Text))
 }
