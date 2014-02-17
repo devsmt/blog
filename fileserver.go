@@ -6,31 +6,16 @@ import (
 	"net/http"
 )
 
-type DocumentParser interface {
-	Parse(r io.Reader) (*Document, error)
-}
-
-type HttpClient interface {
-	Get(url string) (*http.Response, error)
-}
-
-type Host string
-
-func (h Host) Join(path string) string {
-	sep := ""
-	if h[len(h)-1] != '/' {
-		sep = "/"
-	}
-	return string(h) + sep + path
-}
-
 type FileServer struct {
-	host    Host
-	dirfile string
-	client  HttpClient
-	parser  DocumentParser
+	host    host           // URL of host
+	dirfile string         // relative path of directory file
+	client  HttpClient     // an http client for communicating w/ server
+	parser  documentParser // a document parser for interpreting the remote file
 }
 
+// Reads the list of published documents from the server's dirfile,
+// gets those messages, and returns them. Will return (nil, err) as
+// soon as an error is encountered
 func (fs *FileServer) Documents() ([]*Document, error) {
 	rsp, err := fs.httpGet(fs.dirfile)
 	if err != nil {
@@ -48,11 +33,10 @@ func (fs *FileServer) Documents() ([]*Document, error) {
 	}
 	return docs, nil
 }
-func (fs *FileServer) httpGet(relpath string) (*http.Response, error) {
-	githubPath := fs.host.Join(relpath)
-	return fs.client.Get(githubPath)
-}
 
+// Gets a document from the fileserver using `relpath` parameter as
+// the file's address; TODO: What happens if the server returns
+// a non-200 value (e.g., 404)?
 func (fs *FileServer) Get(relpath string) (*Document, error) {
 	rsp, err := fs.httpGet(relpath)
 	if err != nil {
@@ -65,4 +49,29 @@ func (fs *FileServer) Get(relpath string) (*Document, error) {
 	}
 	doc.Metadata["Path"] = relpath
 	return doc, nil
+}
+
+/* Helpers */
+
+type documentParser interface {
+	Parse(r io.Reader) (*Document, error)
+}
+
+type httpClient interface {
+	Get(url string) (*http.Response, error)
+}
+
+type host string
+
+func (h host) Join(path string) string {
+	sep := ""
+	if h[len(h)-1] != '/' {
+		sep = "/"
+	}
+	return string(h) + sep + path
+}
+
+func (fs *FileServer) httpGet(relpath string) (*http.Response, error) {
+	githubPath := fs.host.Join(relpath)
+	return fs.client.Get(githubPath)
 }
