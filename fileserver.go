@@ -9,7 +9,7 @@ import (
 type FileServer struct {
 	host    host           // URL of host
 	dirfile string         // relative path of directory file
-	client  HttpClient     // an http client for communicating w/ server
+	client  httpClient     // an http client for communicating w/ server
 	parser  documentParser // a document parser for interpreting the remote file
 }
 
