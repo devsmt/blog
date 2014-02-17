@@ -12,8 +12,8 @@ type App struct {
 	Port string
 }
 
-// fetches documents from fileserver, reverses the order, and renders them
-// into their HTML templates
+// Home page handler: fetches documents from fileserver, reverses the order,
+// and renders them into the HomeTemplate
 func (a *App) Home(w http.ResponseWriter, r *http.Request) {
 	docs, err := a.FileServer.Documents()
 	if err != nil {
@@ -26,6 +26,9 @@ func (a *App) Home(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Document page handler: fetches a document from fileserver (using the URL's
+// path as the filepath for the fileserver) and rendering it into the
+// DocumentTemplate
 func (a *App) Document(w http.ResponseWriter, r *http.Request) {
 	doc, err := a.FileServer.Get(r.URL.Path)
 	if err != nil {
