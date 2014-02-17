@@ -14,18 +14,6 @@ type metadata struct {
 	k, v string
 }
 
-func parseMetadata(line string) *metadata {
-	index := strings.Index(line, ":")
-	if index == -1 {
-		return nil
-	}
-
-	return &metadata{
-		k: strings.TrimFunc(line[:index], unicode.IsSpace),
-		v: strings.TrimFunc(line[index+1:], unicode.IsSpace),
-	}
-}
-
 // Title: A metadata document parser
 // Date: 2/17/14
 // # A metadata document parser
@@ -53,4 +41,16 @@ func (p *MetadataParser) Parse(r io.Reader) (*Document, error) {
 	}
 	d.Text = d.Text[:len(d.Text)-1] // remove trailing new line
 	return d, nil
+}
+
+func parseMetadata(line string) *metadata {
+	index := strings.Index(line, ":")
+	if index == -1 {
+		return nil
+	}
+
+	return &metadata{
+		k: strings.TrimFunc(line[:index], unicode.IsSpace),
+		v: strings.TrimFunc(line[index+1:], unicode.IsSpace),
+	}
 }
