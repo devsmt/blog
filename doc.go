@@ -1,10 +1,6 @@
 package main
 
-import (
-	"io"
-	"io/ioutil"
-	"github.com/russross/blackfriday"
-)
+import "github.com/russross/blackfriday"
 
 type Document struct {
 	Metadata map[string]string
