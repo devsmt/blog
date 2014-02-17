@@ -2,7 +2,7 @@ package main
 
 import (
 	"net/http"
-	"fmt"
+	"log"
 	"text/template"
 )
 
@@ -33,7 +33,7 @@ func main() {
 	})
 
 	if err := http.ListenAndServe(":8080", nil); err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return
 	}
 }
