@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"bufio"
 	"io"
 	"net/http"
@@ -43,6 +44,11 @@ func (fs *FileServer) Get(relpath string) (*Document, error) {
 		return nil, err
 	}
 	defer rsp.Body.Close()
+
+	if rsp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf(rsp.Status)
+	}
+
 	doc, err := fs.parser.Parse(rsp.Body)
 	if err != nil {
 		return nil, err
@@ -54,7 +60,9 @@ func (fs *FileServer) Get(relpath string) (*Document, error) {
 // Return whether `err` was caused by attempting to access an unknown or invalid
 // path/address
 func (fs *FileServer) IsNotExist(err error) bool {
-	return err != nil && err.Error() == http.StatusText(http.StatusNotFound)
+	statusText := http.StatusText(http.StatusNotFound)
+	notFoundErrMsg := fmt.Sprintf("%d ", http.StatusNotFound) + statusText
+	return err != nil && err.Error() == notFoundErrMsg
 }
 
 /* Helpers */

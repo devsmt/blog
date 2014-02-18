@@ -11,7 +11,7 @@ func (rc MockReadCloser) Read(_ []byte) (int, error) { return 0, nil }
 func (rc MockReadCloser) Close() error { return nil }
 
 type MockClient struct { Status int }
-func (c MockClient) Get(url string) (*http.Response, error) {
+func (c *MockClient) Get(url string) (*http.Response, error) {
 	req, err := http.NewRequest("GET", url, MockReadCloser{})
 	if err != nil {
 		log.Fatal("Unexpected err:", err)
@@ -26,11 +26,11 @@ func (c MockClient) Get(url string) (*http.Response, error) {
 
 type Fixture struct {
 	FileServer
-	Client MockClient
+	Client *MockClient
 }
 
 func fixture() *Fixture {
-	client := MockClient{}
+	client := &MockClient{}
 	return &Fixture {
 		Client: client,
 		FileServer: FileServer {

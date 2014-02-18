@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"log"
 	"io"
@@ -40,13 +41,12 @@ func (a *App) Home(w http.ResponseWriter, r *http.Request) {
 // DocumentTemplate
 func (a *App) Document(w http.ResponseWriter, r *http.Request) {
 	doc, err := a.DocumentStore.Get(r.URL.Path)
-	if err != nil {
+	if a.DocumentStore.IsNotExist(err) {
+		httpErr(w, err, http.StatusNotFound);
+	} else if err != nil {
 		httpErr(w, err, http.StatusInternalServerError)
-		return
-	}
-	if err := a.DocumentTemplate.Execute(w, doc); err != nil {
+	} else if err := a.DocumentTemplate.Execute(w, doc); err != nil {
 		httpErr(w, err, http.StatusInternalServerError)
-		return
 	}
 }
 
@@ -65,9 +65,13 @@ func (a *App) Run() error {
 
 /* Helpers */
 
+func httpErrText(status int) string {
+	return fmt.Sprintf("%d ", status) + http.StatusText(status)
+}
+
 func httpErr(w http.ResponseWriter, err error, status int) {
 	log.Println(err)
-	http.Error(w, http.StatusText(status), status)
+	http.Error(w, httpErrText(status), status)
 }
 
 func reverse(docs []*Document) []*Document {
