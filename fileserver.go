@@ -9,8 +9,8 @@ import (
 type FileServer struct {
 	host    host           // URL of host
 	dirfile string         // relative path of directory file
-	client  httpClient     // an http client for communicating w/ server
-	parser  documentParser // a document parser for interpreting the remote file
+	client  HttpClient     // an http client for communicating w/ server
+	parser  DocumentParser // a document parser for interpreting the remote file
 }
 
 // Reads the list of published documents from the server's dirfile,
@@ -51,19 +51,29 @@ func (fs *FileServer) Get(relpath string) (*Document, error) {
 	return doc, nil
 }
 
+// Return whether `err` was caused by attempting to access an unknown or invalid
+// path/address
+func (fs *FileServer) IsNotExist(err error) bool {
+	return err != nil && err.Error() == http.StatusText(http.StatusNotFound)
+}
+
 /* Helpers */
 
-type documentParser interface {
+type DocumentParser interface {
 	Parse(r io.Reader) (*Document, error)
 }
 
-type httpClient interface {
+type HttpClient interface {
 	Get(url string) (*http.Response, error)
 }
 
 type host string
 
 func (h host) Join(path string) string {
+	if len(h) < 1 {
+		return path
+	}
+
 	sep := ""
 	if h[len(h)-1] != '/' {
 		sep = "/"

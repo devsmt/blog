@@ -12,7 +12,7 @@ func parseTemplate(filepath string) *template.Template {
 
 func main() {
 	app := App {
-		FileServer: FileServer{
+		DocumentStore: &FileServer{
 			//host: "http://localhost:3000",
 			host: "http://weberc2.github.io/",
 			dirfile: "dirfile",
@@ -21,18 +21,10 @@ func main() {
 		},
 		HomeTemplate: parseTemplate("home.html"),
 		DocumentTemplate: parseTemplate("document.html"),
+		Port: ":8080",
 	}
 
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		switch r.URL.Path {
-		case "/":
-			app.Home(w, r)
-		default:
-			app.Document(w, r)
-		}
-	})
-
-	if err := http.ListenAndServe(":8080", nil); err != nil {
+	if err := app.Run(); err != nil {
 		log.Println(err)
 		return
 	}
