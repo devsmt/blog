@@ -17,7 +17,7 @@ func (c *MockClient) Get(url string) (*http.Response, error) {
 		log.Fatal("Unexpected err:", err)
 	}
 	return &http.Response {
-		Status: http.StatusText(c.Status),
+		Status: httpErrText(c.Status),
 		StatusCode: c.Status,
 		Body: MockReadCloser{},
 		Request: req,
