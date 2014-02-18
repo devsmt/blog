@@ -1,9 +1,9 @@
 package main
 
 import (
-	"testing"
-	"strings"
 	"fmt"
+	"strings"
+	"testing"
 )
 
 func expectStr(exp, act string) error {
@@ -58,8 +58,8 @@ func TestParse_MultipleLinesInBody(t *testing.T) {
 func TestParse_WithMetadata(t *testing.T) {
 	if err := testParse(
 		"Title:SomeTitle\nAuthor:SomeName\nThis is the body",
-		map[string]string {
-			"Title" : "SomeTitle",
+		map[string]string{
+			"Title":  "SomeTitle",
 			"Author": "SomeName",
 		},
 		"This is the body",
@@ -70,9 +70,9 @@ func TestParse_WithMetadata(t *testing.T) {
 
 func TestParse_MultipleWordsInValue(t *testing.T) {
 	if err := testParse(`Title:Some Title
-This is the body`, map[string]string {
-			"Title" : "Some Title",
-		}, "This is the body"); err != nil {
+This is the body`, map[string]string{
+		"Title": "Some Title",
+	}, "This is the body"); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -84,17 +84,17 @@ func TestParse_MultipleWordsInKey(t *testing.T) {
 
 func TestParse_SpacesAroundDelimeter(t *testing.T) {
 	if err := testParse(`Title : Some Title
-This is the body`, map[string]string {
-			"Title" : "Some Title",
-		}, "This is the body"); err != nil {
+This is the body`, map[string]string{
+		"Title": "Some Title",
+	}, "This is the body"); err != nil {
 		t.Fatal(err)
 	}
 }
 
 func TestParse_TrailingValueSpaceAndLeadingKeySpace(t *testing.T) {
 	if err := testParse(" Title : Some Title \nThis is the body",
-		map[string]string {
-			"Title" : "Some Title",
+		map[string]string{
+			"Title": "Some Title",
 		}, "This is the body"); err != nil {
 		t.Fatal(err)
 	}

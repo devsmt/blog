@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	"net/http"
-	"log"
 	"io"
+	"log"
+	"net/http"
 )
 
 type Template interface {
@@ -20,7 +20,7 @@ type DocumentStore interface {
 type App struct {
 	DocumentStore
 	HomeTemplate, DocumentTemplate Template
-	Port string
+	Port                           string
 }
 
 // Home page handler: fetches documents from fileserver, reverses the order,
@@ -42,7 +42,7 @@ func (a *App) Home(w http.ResponseWriter, r *http.Request) {
 func (a *App) Document(w http.ResponseWriter, r *http.Request) {
 	doc, err := a.DocumentStore.Get(r.URL.Path)
 	if a.DocumentStore.IsNotExist(err) {
-		httpErr(w, err, http.StatusNotFound);
+		httpErr(w, err, http.StatusNotFound)
 	} else if err != nil {
 		httpErr(w, err, http.StatusInternalServerError)
 	} else if err := a.DocumentTemplate.Execute(w, doc); err != nil {
@@ -76,7 +76,7 @@ func httpErr(w http.ResponseWriter, err error, status int) {
 
 func reverse(docs []*Document) []*Document {
 	reversed := make([]*Document, len(docs))
-	for i:=0; i<len(docs); i++ {
+	for i := 0; i < len(docs); i++ {
 		reversed[len(reversed)-1-i] = docs[i]
 	}
 	return reversed

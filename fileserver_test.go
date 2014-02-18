@@ -2,25 +2,27 @@ package main
 
 import (
 	"log"
-	"testing"
 	"net/http"
+	"testing"
 )
 
-type MockReadCloser struct {}
-func (rc MockReadCloser) Read(_ []byte) (int, error) { return 0, nil }
-func (rc MockReadCloser) Close() error { return nil }
+type MockReadCloser struct{}
 
-type MockClient struct { Status int }
+func (rc MockReadCloser) Read(_ []byte) (int, error) { return 0, nil }
+func (rc MockReadCloser) Close() error               { return nil }
+
+type MockClient struct{ Status int }
+
 func (c *MockClient) Get(url string) (*http.Response, error) {
 	req, err := http.NewRequest("GET", url, MockReadCloser{})
 	if err != nil {
 		log.Fatal("Unexpected err:", err)
 	}
-	return &http.Response {
-		Status: httpErrText(c.Status),
+	return &http.Response{
+		Status:     httpErrText(c.Status),
 		StatusCode: c.Status,
-		Body: MockReadCloser{},
-		Request: req,
+		Body:       MockReadCloser{},
+		Request:    req,
 	}, nil
 }
 
@@ -31,9 +33,9 @@ type Fixture struct {
 
 func fixture() *Fixture {
 	client := &MockClient{}
-	return &Fixture {
+	return &Fixture{
 		Client: client,
-		FileServer: FileServer {
+		FileServer: FileServer{
 			client: client,
 			parser: &MetadataParser{},
 		},

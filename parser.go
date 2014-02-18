@@ -25,7 +25,7 @@ type metadata struct {
 // document body. This comment is an example of such a document.
 func (p *MetadataParser) Parse(r io.Reader) (*Document, error) {
 	s := bufio.NewScanner(r)
-	d := &Document{ Metadata: make(map[string]string) }
+	d := &Document{Metadata: make(map[string]string)}
 	for s.Scan() {
 		meta := parseMetadata(s.Text())
 		if meta == nil { // TODO if we get here, this line should be added as text
