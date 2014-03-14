@@ -1,11 +1,7 @@
-<html>
-<head>
-	<title>Home</title>
-</head>
-<body>
-{{range .}}
-	<h2><a href="{{.Metadata.Path}}">{{.Metadata.Title}}</a></h2>
-	{{.Html}}
+{{define "head"}}<title>Home</title>{{end}}
+{{define "body"}}
+	{{range .}}
+		<h2><a href="{{.Metadata.Path}}">{{.Metadata.Title}}</a></h2>
+		{{.Html}}
+	{{end}}
 {{end}}
-</body>
-</html>

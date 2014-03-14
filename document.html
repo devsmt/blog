@@ -1,7 +1,5 @@
-<html>
-<head>
-</head>
-<body>
+{{define "head"}}<title>{{.Metadata.Title}}</title>{{end}}
+{{define "body"}}
 	<h2>{{.Metadata.Title}}</h2>
 	{{.Html}}
-</body>
+{{end}}

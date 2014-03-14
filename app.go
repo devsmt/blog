@@ -8,7 +8,7 @@ import (
 )
 
 type Template interface {
-	Execute(w io.Writer, data interface{}) error
+	ExecuteTemplate(w io.Writer, name string, data interface{}) error
 }
 
 type DocumentStore interface {
@@ -31,7 +31,7 @@ func (a *App) Home(w http.ResponseWriter, r *http.Request) {
 		httpErr(w, err, http.StatusNotFound)
 	} else if err != nil {
 		httpErr(w, err, http.StatusInternalServerError)
-	} else if err := a.HomeTemplate.Execute(w, reverse(docs)); err != nil {
+	} else if err := a.HomeTemplate.ExecuteTemplate(w, "base", reverse(docs)); err != nil {
 		httpErr(w, err, http.StatusInternalServerError)
 	}
 }
@@ -45,7 +45,7 @@ func (a *App) Document(w http.ResponseWriter, r *http.Request) {
 		httpErr(w, err, http.StatusNotFound)
 	} else if err != nil {
 		httpErr(w, err, http.StatusInternalServerError)
-	} else if err := a.DocumentTemplate.Execute(w, doc); err != nil {
+	} else if err := a.DocumentTemplate.ExecuteTemplate(w, "base", doc); err != nil {
 		httpErr(w, err, http.StatusInternalServerError)
 	}
 }

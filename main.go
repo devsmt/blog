@@ -6,8 +6,8 @@ import (
 	"text/template"
 )
 
-func parseTemplate(filepath string) *template.Template {
-	return template.Must(template.ParseFiles(filepath))
+func parseTemplate(filepath ...string) *template.Template {
+	return template.Must(template.ParseFiles(filepath...))
 }
 
 func main() {
@@ -19,8 +19,8 @@ func main() {
 			client:  http.DefaultClient,
 			parser:  new(MetadataParser),
 		},
-		HomeTemplate:     parseTemplate("home.html"),
-		DocumentTemplate: parseTemplate("document.html"),
+		HomeTemplate:     parseTemplate("home.html", "base.html"),
+		DocumentTemplate: parseTemplate("document.html", "base.html"),
 		Port:             ":8080",
 	}
 
