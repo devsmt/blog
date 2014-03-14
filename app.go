@@ -13,7 +13,7 @@ type Template interface {
 
 type DocumentStore interface {
 	Get(addr string) (*Document, error)
-	Documents() ([]*Document, error)
+	Documents(start, end int) ([]*Document, error)
 	IsNotExist(err error) bool
 }
 
@@ -21,17 +21,18 @@ type App struct {
 	DocumentStore
 	HomeTemplate, DocumentTemplate Template
 	Port                           string
+	PageSize int
 }
 
 // Home page handler: fetches documents from fileserver, reverses the order,
 // and renders them into the HomeTemplate
 func (a *App) Home(w http.ResponseWriter, r *http.Request) {
-	docs, err := a.DocumentStore.Documents()
+	docs, err := a.DocumentStore.Documents(0, a.PageSize)
 	if a.DocumentStore.IsNotExist(err) {
 		httpErr(w, err, http.StatusNotFound)
 	} else if err != nil {
 		httpErr(w, err, http.StatusInternalServerError)
-	} else if err := a.HomeTemplate.ExecuteTemplate(w, "base", reverse(docs)); err != nil {
+	} else if err := a.HomeTemplate.ExecuteTemplate(w, "base", docs); err != nil {
 		httpErr(w, err, http.StatusInternalServerError)
 	}
 }
@@ -52,10 +53,10 @@ func (a *App) Document(w http.ResponseWriter, r *http.Request) {
 
 func (a *App) Run() error {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		switch r.URL.Path {
-		case "/":
+		path := r.URL.Path
+		if path == "/" {
 			a.Home(w, r)
-		default:
+		} else {
 			a.Document(w, r)
 		}
 	})
@@ -72,12 +73,4 @@ func httpErrText(status int) string {
 func httpErr(w http.ResponseWriter, err error, status int) {
 	log.Println(err)
 	http.Error(w, httpErrText(status), status)
-}
-
-func reverse(docs []*Document) []*Document {
-	reversed := make([]*Document, len(docs))
-	for i := 0; i < len(docs); i++ {
-		reversed[len(reversed)-1-i] = docs[i]
-	}
-	return reversed
 }

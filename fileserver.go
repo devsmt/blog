@@ -17,7 +17,7 @@ type FileServer struct {
 // Reads the list of published documents from the server's dirfile,
 // gets those messages, and returns them. Will return (nil, err) as
 // soon as an error is encountered
-func (fs *FileServer) Documents() ([]*Document, error) {
+func (fs *FileServer) Documents(start, end int) ([]*Document, error) {
 	rsp, err := fs.httpGet(fs.dirfile)
 	if err != nil {
 		return nil, err
@@ -25,11 +25,17 @@ func (fs *FileServer) Documents() ([]*Document, error) {
 	defer rsp.Body.Close()
 
 	docs := []*Document{}
-	for s := bufio.NewScanner(rsp.Body); s.Scan(); {
+	for i, s := 0, bufio.NewScanner(rsp.Body); s.Scan() || i >= end; i++ {
+		// skip to the beginning
+		if i < start {
+			continue
+		}
+
 		doc, err := fs.Get(s.Text())
 		if err != nil {
 			return nil, err
 		}
+
 		docs = append(docs, doc)
 	}
 	return docs, nil
