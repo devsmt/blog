@@ -1,5 +1,8 @@
 {{define "head"}}<title>{{.Metadata.Title}}</title>{{end}}
 {{define "body"}}
-	<h2>{{.Metadata.Title}}</h2>
-	{{.Html}}
+	<article>
+		{{if .Metadata.Title}}<h2>{{.Metadata.Title}}</h2>{{end}}
+		{{if .Metadata.Date}}<i>{{.Metadata.Date}}</i>{{end}}
+		{{.Html}}
+	</article>
 {{end}}

@@ -1,8 +1,15 @@
 {{define "head"}}<title>Home</title>{{end}}
 {{define "body"}}
 	{{range .Docs}}
-		<h2><a href="{{.Metadata.Path}}">{{.Metadata.Title}}</a></h2>
-		{{.Html}}
+		<article>
+			<h2><a href="{{.Metadata.Path}}">{{.Metadata.Title}}</a></h2>
+			{{if .Snippet}}
+				{{.Snippet}}
+				<p><a href="{{.Metadata.Path}}">Read more...</a></p>
+			{{else}}
+				{{.Html}}
+			{{end}}
+		</article>
 	{{end}}
 	{{if .PreviousPage}}
 	<a href="/page/{{.PreviousPage}}">Previous</a>
