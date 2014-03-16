@@ -25,10 +25,7 @@ func (fs *FileServer) Documents(start, end int) ([]*Document, error) {
 	defer rsp.Body.Close()
 
 	docs := []*Document{}
-	println("Got here")
-	for i, s := 0, bufio.NewScanner(rsp.Body); s.Scan() || i >= end; i++ {
-		println("And here")
-		fmt.Printf("Line %d of dirfile: %v\n", i, s.Text())
+	for i, s := 0, bufio.NewScanner(rsp.Body); s.Scan() && i < end; i++ {
 		// skip to the beginning
 		if i < start {
 			continue

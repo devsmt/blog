@@ -34,12 +34,11 @@ func (rc *MockClient) AddFile(name, contents string) {
 	rc.files[name] = contents
 }
 
-func (rc *MockClient) AppendToFile(name, text string) {
-	rc.files[name] += text
+func (rc *MockClient) AppendLineToFile(name, text string) {
+	rc.files[name] += text + "\n"
 }
 
 func (c *MockClient) Get(url string) (*http.Response, error) {
-	println("Request for", url)
 	req, err := http.NewRequest("GET", url, NewMockReadCloser(""))
 	if err != nil {
 		log.Fatal("Unexpected err:", err)
@@ -48,7 +47,7 @@ func (c *MockClient) Get(url string) (*http.Response, error) {
 	return &http.Response{
 		Status:     fmt.Sprintf("%d ", c.Status) + http.StatusText(c.Status),
 		StatusCode: c.Status,
-		Body:       NewMockReadCloser(""),
+		Body:       NewMockReadCloser(c.files[url]),
 		Request:    req,
 	}, nil
 }

@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"testing"
 	. "github.com/weberc2/blog/testsupport"
+	"strconv"
 )
 
 type Fixture struct {
@@ -12,7 +13,7 @@ type Fixture struct {
 }
 
 func (f *Fixture) NewFile(name, content string) {
-	f.Client.AppendToFile(f.dirfile, name)
+	f.Client.AppendLineToFile(f.dirfile, name)
 	f.Client.AddFile(name, content)
 }
 
@@ -66,20 +67,61 @@ func TestDocuments(t *testing.T) {
 	}
 
 	for i, doc := range docs {
-		t.Fatal("TODO: Validate the contents are as expected")
+		exp := files[strconv.Itoa(i+1)]
+		act := string(doc.Text)
+		if err := Compare(exp, act); err != nil {
+			t.Fatal(err)
+		}
 	}
 }
 
 func TestDocuments_WhenEndExceedsNumberOfDocsInDirectoryFile(t *testing.T) {
 	// Given 5 documents in directory file
+	f := fixture()
+	files := map[string]string {
+		"1" : "first",
+		"2" : "second",
+		"3" : "third",
+		"4" : "fourth",
+		"5" : "fifth",
+	}
+
+	for name, content := range files {
+		f.NewFile(name, content)
+	}
+
 	// When documents 0-6 are requested
+	docs, err := f.Documents(0, 6)
+	if err != nil {
+		t.Fatalf("Unexpected err: ", err)
+	}
+
 	// Expect that 5 documents are returned
-	t.Fatal("Finish me!")
+	if n := len(docs); n != 5 {
+		t.Errorf("Expected 5; Got %d", n)
+	}
+
+	for i, doc := range docs {
+		exp := files[strconv.Itoa(i+1)]
+		act := string(doc.Text)
+		if err := Compare(exp, act); err != nil {
+			t.Fatal(err)
+		}
+	}
 }
 
 func TestDocuments_WhenEmpty(t *testing.T) {
 	// Given no documents in directory file
+	f := fixture()
+
 	// When documents 0-1 are requested
+	docs, err := f.Documents(0, 6)
+	if err != nil {
+		t.Fatalf("Unexpected err: ", err)
+	}
+
 	// Expect that no documents are returned
-	t.Fatal("Finish me!")
+	if n := len(docs); n != 0 {
+		t.Errorf("Expected 0; Got %d", n)
+	}
 }
