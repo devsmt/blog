@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 	"text/template"
 )
 
@@ -21,7 +22,7 @@ func main() {
 		},
 		HomeTemplate:     parseTemplate("home.html", "base.html"),
 		DocumentTemplate: parseTemplate("document.html", "base.html"),
-		Port:             ":8080",
+		Port:             ":" + os.Getenv("PORT"),
 		PageSize:         10,
 	}
 
