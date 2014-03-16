@@ -1,10 +1,10 @@
 package main
 
 import (
-	"net/http"
-	"testing"
 	. "github.com/weberc2/blog/testsupport"
+	"net/http"
 	"strconv"
+	"testing"
 )
 
 type Fixture struct {
@@ -22,8 +22,8 @@ func fixture() *Fixture {
 	return &Fixture{
 		Client: client,
 		FileServer: FileServer{
-			client: client,
-			parser: &MetadataParser{},
+			client:  client,
+			parser:  &MetadataParser{},
 			dirfile: "dirfile",
 		},
 	}
@@ -43,12 +43,12 @@ func TestGet_HttpClientReturns404(t *testing.T) {
 func TestDocuments(t *testing.T) {
 	// Given 5 documents in fileserver
 	f := fixture()
-	files := map[string]string {
-		"1" : "first",
-		"2" : "second",
-		"3" : "third",
-		"4" : "fourth",
-		"5" : "fifth",
+	files := map[string]string{
+		"1": "first",
+		"2": "second",
+		"3": "third",
+		"4": "fourth",
+		"5": "fifth",
 	}
 
 	for name, content := range files {
@@ -78,12 +78,12 @@ func TestDocuments(t *testing.T) {
 func TestDocuments_WhenEndExceedsNumberOfDocsInDirectoryFile(t *testing.T) {
 	// Given 5 documents in directory file
 	f := fixture()
-	files := map[string]string {
-		"1" : "first",
-		"2" : "second",
-		"3" : "third",
-		"4" : "fourth",
-		"5" : "fifth",
+	files := map[string]string{
+		"1": "first",
+		"2": "second",
+		"3": "third",
+		"4": "fourth",
+		"5": "fifth",
 	}
 
 	for name, content := range files {

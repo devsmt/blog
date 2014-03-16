@@ -2,10 +2,10 @@ package testsupport
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"strings"
-	"io"
 )
 
 type MockReadCloser struct {
@@ -24,7 +24,7 @@ type MockClient struct {
 }
 
 func NewMockClient() *MockClient {
-	return &MockClient {
+	return &MockClient{
 		Status: http.StatusOK,
 		files:  map[string]string{},
 	}

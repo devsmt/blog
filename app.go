@@ -5,8 +5,8 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"strings"
 	"strconv"
+	"strings"
 )
 
 const pagePrefix = "/page/"
@@ -18,6 +18,7 @@ type Template interface {
 type DocumentStore interface {
 	Get(addr string) (*Document, error)
 	Documents(start, end int) ([]*Document, error)
+	DocumentCount() (int, error)
 	IsNotExist(err error) bool
 }
 
@@ -44,30 +45,22 @@ func (a *App) Page(w http.ResponseWriter, r *http.Request) {
 func (a *App) pageHandler(w http.ResponseWriter, pageNumber int) {
 	start := pageNumber * a.PageSize
 	end := start + a.PageSize
+
 	docs, err := a.DocumentStore.Documents(start, end)
-	if a.DocumentStore.IsNotExist(err) {
-		httpErr(w, err, http.StatusNotFound)
-	} else if err != nil {
+	if err != nil {
+		if a.DocumentStore.IsNotExist(err) {
+			httpErr(w, err, http.StatusNotFound)
+			return
+		}
 		httpErr(w, err, http.StatusInternalServerError)
+		return
 	}
 
-	homePage := struct {
-		Docs []*Document
-		PreviousPage, NextPage string
-	} {
-		Docs: docs,
+	homePage, err := a.setupHomePage(docs, pageNumber)
+	if err != nil {
+		httpErr(w, err, http.StatusInternalServerError)
+		return
 	}
-
-	previousPage := pageNumber - 1
-	if previousPage >= 0 {
-		homePage.PreviousPage = strconv.Itoa(previousPage)
-	}
-
-	nextPage := pageNumber + 1
-//	 if nextPage <= a.DocumentStore.DocumentCount() / a.PageSize {
-	homePage.NextPage = strconv.Itoa(nextPage)
-//	 }
-
 	if err := a.HomeTemplate.ExecuteTemplate(w, "base", homePage); err != nil {
 		httpErr(w, err, http.StatusInternalServerError)
 	}
@@ -84,13 +77,15 @@ func (a *App) Home(w http.ResponseWriter, r *http.Request) {
 // DocumentTemplate
 func (a *App) Document(w http.ResponseWriter, r *http.Request) {
 	doc, err := a.DocumentStore.Get(r.URL.Path)
+	var status int
 	if a.DocumentStore.IsNotExist(err) {
-		httpErr(w, err, http.StatusNotFound)
+		status = http.StatusNotFound
 	} else if err != nil {
-		httpErr(w, err, http.StatusInternalServerError)
+		status = http.StatusInternalServerError
 	} else if err := a.DocumentTemplate.ExecuteTemplate(w, "base", doc); err != nil {
-		httpErr(w, err, http.StatusInternalServerError)
+		status = http.StatusInternalServerError
 	}
+	httpErr(w, err, status)
 }
 
 func (a *App) Run() error {
@@ -106,6 +101,25 @@ func (a *App) Run() error {
 	})
 
 	return http.ListenAndServe(a.Port, nil)
+}
+
+func (a *App) setupHomePage(docs []*Document, pageNumber int) (map[string]interface{}, error) {
+	homePage := map[string]interface{}{
+		"Docs": docs,
+	}
+
+	if previousPage := pageNumber - 1; previousPage >= 0 {
+		homePage["PreviousPage"] = strconv.Itoa(previousPage)
+	}
+
+	count, err := a.DocumentStore.DocumentCount()
+	if err != nil {
+		return nil, err
+	}
+	if nextPage := pageNumber + 1; nextPage <= count/a.PageSize {
+		homePage["NextPage"] = strconv.Itoa(nextPage)
+	}
+	return homePage, nil
 }
 
 /* Helpers */

@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 )
 
@@ -14,29 +15,66 @@ type FileServer struct {
 	parser  DocumentParser // a document parser for interpreting the remote file
 }
 
+func _close(closer io.Closer) {
+	if err := closer.Close(); err != nil {
+		log.Println(err)
+	}
+}
+
+// continue if `f` returns `(true, nil)`
+func (fs *FileServer) forLineInDirfile(f func(i int, line string) (bool, error)) error {
+	rsp, err := fs.httpGet(fs.dirfile)
+	if err != nil {
+		return err
+	}
+	defer _close(rsp.Body)
+
+	for i, s := 0, bufio.NewScanner(rsp.Body); s.Scan(); i++ {
+		if err := s.Err(); err != nil {
+			return err
+		}
+
+		if cont, err := f(i, s.Text()); err != nil || !cont {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (fs *FileServer) DocumentCount() (int, error) {
+	count := 0
+	if err := fs.forLineInDirfile(func(i int, _ string) (bool, error) {
+		count = i
+		return true, nil
+	}); err != nil {
+		return -1, err
+	}
+	return count, nil
+}
+
 // Reads the list of published documents from the server's dirfile,
 // gets those messages, and returns them. Will return (nil, err) as
 // soon as an error is encountered
 func (fs *FileServer) Documents(start, end int) ([]*Document, error) {
-	rsp, err := fs.httpGet(fs.dirfile)
-	if err != nil {
-		return nil, err
-	}
-	defer rsp.Body.Close()
-
 	docs := []*Document{}
-	for i, s := 0, bufio.NewScanner(rsp.Body); s.Scan() && i < end; i++ {
-		// skip to the beginning
-		if i < start {
-			continue
+	if err := fs.forLineInDirfile(func(i int, line string) (bool, error) {
+		if i >= end {
+			return false, nil
 		}
 
-		doc, err := fs.Get(s.Text())
+		if i < start { // fast forward to first relevant record
+			return true, nil
+		}
+
+		doc, err := fs.Get(line)
 		if err != nil {
-			return nil, err
+			return false, err
 		}
-
 		docs = append(docs, doc)
+		return true, nil
+	}); err != nil {
+		return nil, err
 	}
 	return docs, nil
 }
