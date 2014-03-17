@@ -12,6 +12,7 @@ func parseTemplate(filepath ...string) *template.Template {
 }
 
 func main() {
+	log.SetFlags(log.Lshortfile)
 	app := App{
 		DocumentStore: &FileServer{
 			//host: "http://localhost:8000",
@@ -20,14 +21,14 @@ func main() {
 			client:  http.DefaultClient,
 			parser:  new(MetadataParser),
 		},
-		HomeTemplate:     parseTemplate("home.html", "base.html"),
-		DocumentTemplate: parseTemplate("document.html", "base.html"),
+		HomeTemplate:     parseTemplate("home.html", "google-analytics.html", "css.html", "base.html"),
+		DocumentTemplate: parseTemplate("document.html", "google-analytics.html", "css.html", "base.html", "disqus.html"),
 		Port:             ":" + os.Getenv("PORT"),
 		PageSize:         10,
 	}
 
 	if err := app.Run(); err != nil {
-		log.Println(err)
+		log.Println("Error running app:", err)
 		return
 	}
 }

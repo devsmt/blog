@@ -36,33 +36,34 @@ func (a *App) Page(w http.ResponseWriter, r *http.Request) {
 	pageString := r.URL.Path[len(pagePrefix):]
 	pageNumber, err := strconv.Atoi(pageString)
 	if err != nil {
-		httpErr(w, err, http.StatusNotFound)
+		httpErr(w, "Error converting URL page number to int", err, http.StatusNotFound)
 		return
 	}
 	a.pageHandler(w, pageNumber)
 }
 
 func (a *App) pageHandler(w http.ResponseWriter, pageNumber int) {
+	const logCtx = "app.go pageHandler()"
 	start := pageNumber * a.PageSize
 	end := start + a.PageSize
 
 	docs, err := a.DocumentStore.Documents(start, end)
 	if err != nil {
 		if a.DocumentStore.IsNotExist(err) {
-			httpErr(w, err, http.StatusNotFound)
+			httpErr(w, logCtx, err, http.StatusNotFound)
 			return
 		}
-		httpErr(w, err, http.StatusInternalServerError)
+		httpErr(w, logCtx, err, http.StatusInternalServerError)
 		return
 	}
 
 	homePage, err := a.setupHomePage(docs, pageNumber)
 	if err != nil {
-		httpErr(w, err, http.StatusInternalServerError)
+		httpErr(w, logCtx, err, http.StatusInternalServerError)
 		return
 	}
 	if err := a.HomeTemplate.ExecuteTemplate(w, "base", homePage); err != nil {
-		httpErr(w, err, http.StatusInternalServerError)
+		httpErr(w, logCtx, err, http.StatusInternalServerError)
 	}
 }
 
@@ -76,8 +77,8 @@ func (a *App) Home(w http.ResponseWriter, r *http.Request) {
 // path as the filepath for the fileserver) and rendering it into the
 // DocumentTemplate
 func (a *App) Document(w http.ResponseWriter, r *http.Request) {
+	status := -1
 	doc, err := a.DocumentStore.Get(r.URL.Path)
-	var status int
 	if a.DocumentStore.IsNotExist(err) {
 		status = http.StatusNotFound
 	} else if err != nil {
@@ -85,7 +86,10 @@ func (a *App) Document(w http.ResponseWriter, r *http.Request) {
 	} else if err := a.DocumentTemplate.ExecuteTemplate(w, "base", doc); err != nil {
 		status = http.StatusInternalServerError
 	}
-	httpErr(w, err, status)
+
+	if status != -1 {
+		httpErr(w, "Document handler", err, status)
+	}
 }
 
 func (a *App) Run() error {
@@ -128,7 +132,7 @@ func httpErrText(status int) string {
 	return fmt.Sprintf("%d ", status) + http.StatusText(status)
 }
 
-func httpErr(w http.ResponseWriter, err error, status int) {
-	log.Println(err)
+func httpErr(w http.ResponseWriter, ctx string, err error, status int) {
+	log.Println(ctx+":", err)
 	http.Error(w, httpErrText(status), status)
 }
